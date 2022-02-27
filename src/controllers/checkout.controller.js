@@ -1,18 +1,17 @@
-const stripe = require('stripe')("sk_test_51IYB3kKHE4A4HHrOUKXd5GZqbWNq1QSmWvqY2al9fB1K2XCKk3vlC7N0e8Ob20IZVLEYrExnMZycwBlTKPuyrnNY001cANctnM");
+const stripe = require("stripe")(
+  "sk_test_51IYAy4EMn5LU6PTLwpnqc9bJdhlcRl00wA5zVAMDLC2hF2LXbI9gisvB2vcF7d2e4CtZEzbBhfZZRJGb7LnZyaJY00mbH6ynB0"
+);
 
 const initiateStripeSession = async (req) => {
-
-  // console.log(req.user);
-
   const priceDataArray = [];
 
   priceDataArray.push({
     price_data: {
       currency: "eur",
       product_data: {
-        name: "Abonnement",
+        name: `  ${req.body.label} Subscribe`,
       },
-      unit_amount: 8.99 * 100,
+      unit_amount: req.body.price * 100,
     },
     quantity: 1,
   });
@@ -37,19 +36,21 @@ const initiateStripeSession = async (req) => {
       // metadata: { userId: req.user.id, cart: JSON.stringify(req.body.cart) },
     },
     mode: "payment",
-    // success_url: `http://localhost:3000/confirmation`,
-    success_url: `http://localhost:3000/movies`,
-    cancel_url: `http://localhost:3000/cancel`,
+    success_url: `http://localhost:3000/browse`,
+    cancel_url: `http://localhost:3000/`,
   });
   return session;
 };
 
 exports.createSession = async function (req, res) {
   try {
+    console.log(req);
     const session = await initiateStripeSession(req);
+    console.log(session);
+
     res.status(200).json({
       id: session.id,
-      price: session.amout_total,
+      price: session.amount_total,
       currency: session.currency,
     });
   } catch (err) {
