@@ -16,19 +16,6 @@ const initiateStripeSession = async (req) => {
     quantity: 1,
   });
 
-  // req.body.cart.forEach((element) => {
-  //   priceDataArray.push({
-  //     price_data: {
-  //       currency: "eur",
-  //       product_data: {
-  //         name: element.title,
-  //       },
-  //       unit_amount: element.price * 100,
-  //     },
-  //     quantity: element.qty,
-  //   });
-  // });
-
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     line_items: priceDataArray,

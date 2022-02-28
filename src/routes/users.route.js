@@ -3,13 +3,16 @@ const router = express.Router();
 const userController = require('../controllers/user.controller');
 const verifyToken = require('../helpers/verifyToken');
 
-router.get('/get-user', verifyToken, userController.getUser);
-router.get('/get-users', userController.getUsers);
-router.delete('/user/delete/:id', userController.removeOne);
+router.get('/getUser', verifyToken, userController.getUser);
+router.get('/getUsers', userController.getUsers);
 router.get('/verifytoken', verifyToken, userController.verifyToken);
-router.post('/register', userController.register);
-router.post('/login', userController.login);
+
+router.post('/signup', userController.signup);
+router.post('/signin', userController.signin);
+router.post('/createUser', userController.createUser)
+
 router.put('/update-user', verifyToken, userController.updateUser);
-router.post('/addadmin', userController.addAdmin)
+
+router.delete('/user/delete/:id', userController.deleteUser);
 
 module.exports = router;

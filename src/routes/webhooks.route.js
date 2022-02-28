@@ -1,8 +1,8 @@
 const express = require('express');
-const router = express.Router();
+const bodyParser = require('body-parser');
 const webhookController = require('../controllers/webhooks.controller');
-const bodyParser = require('body-parser')
 
+const router = express.Router();
 router.post('/stripe', bodyParser.raw({ type: 'application/json' }),webhookController.stripewebhook);
 
 module.exports = router;

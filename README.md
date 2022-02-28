@@ -1,30 +1,63 @@
-# fullstack-back
+# Netflix backend
 
-# graphql
+## Graphql requests
 
+1. queries
+
+- get a category:
+  ```
+  query{
+    getCategory(id: "62178a400ca95b2bf8f89955"){id,label}
+  }
+  ```
+
+- get all categories:
+  ```
+  query{
+    getCategories{id,label}
+  }
+  ```
+
+- get a movie:
+  ```
+    query{
+      getMovie(id: "6217a2dfa2ea2a4448e7b240"){id,title,image,trailer}
+    }
+  ```
+  
+- get movies:
 ```
-mutation {createProduct(
-  title: "Titre",
-  description: "decription",
-  img: "https://vonguru.fr/wp-content/uploads/2021/12/sword-art-online-progressive-movie-breves-cine-series-vonguru.jpg",
-  age: 12,
-  language: "Français",
-  releaseDate: 2021,
-  duration: "1h30",
-  director: "Thomas",
-  scriptwriter: "Thomas",
-  genres: ["62178bafb300d63ce41caf03", "62178bbab300d63ce41caf05"]
-){id}
-}
-```
-```
-query{getProducts{id, title, genres{title}}}
+  query{
+    getMovies{id, title, description, image, trailer, maturityRating, language, releaseDate, duration, director, distribution, scriptwriter, categories{label}}
+  }
 ```
 
-```
-query	{getProduct(id:"62178c38b300d63ce41caf07"){genres{title}}}
-```
+2. Mutations
 
-```
-mutation {createGenre(title:"Fantasy"){title}}
-```
+- Create a new category:
+  ```
+      mutation{
+      createCategory(
+          label: "TV Shows"
+      ){id,label}
+      }
+  ```
+
+- Creating a new movie:
+  ```
+    mutation {
+      createMovie(
+        title: "John Wick: Chapter 3 - Parabellum"
+        image: "https://fr.web.img3.acsta.net/c_310_420/pictures/19/05/21/15/23/4992794.jpg",
+        trailer: "https://www.youtube.com/watch?v=pU8-7BX9uxs"
+        maturityRating: 16
+        language: "Eng",
+        releaseDate: 2019,
+        duration: "1h40",
+        director: "Derek Kolstad",
+        scriptwriter: "Derek Kolstad",
+        description: "John Wick a transgressé une règle fondamentale : il a tué à l’intérieur même de l’Hôtel Continental. Excommunié, tous les services liés au Continental lui sont fermés et sa tete mise a prix. John se retrouve sans soutien, traque par tous les plus dangereux tueurs du monde."
+        categories: ["62178a4b0ca95b2bf8f89957", "62178aae0ca95b2bf8f8996f"]
+      ){id}
+    }
+  ```

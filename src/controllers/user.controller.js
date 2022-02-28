@@ -1,20 +1,20 @@
-const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user.model");
 const configs = require("../configs");
 
-exports.register = (req, res) => {
+exports.signup = (req, res) => {
   let hashedPassword = bcrypt.hashSync(req.body.password, 10);
 
   const user = new User({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
-    isAdmin: req.body.isAdmin,
-    isSubscribe: req.body.isSubscribe,
-    isPremium: req.body.isPremium,
-    subscribeDate: req.body.subscribeDate,
     email: req.body.email,
     password: hashedPassword,
+    subscribeDate: req.body.subscribeDate,
+    isStandard: req.body.isStandard,
+    isPremium: req.body.isPremium,
+    isAdmin: req.body.isAdmin,
   });
 
   user
@@ -37,51 +37,19 @@ exports.register = (req, res) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message: err.message || "Some error occured",
+        message:
+          err.message || "[X] Some error occurred while creating a new user!",
       });
     });
 };
 
-exports.addAdmin = (req, res) => {
-  let hashedPassword = bcrypt.hashSync(req.body.password, 10);
-  //   console.log(hasedPassword);
-		const user = new User({
-			firstName: req.body.firstName,
-			lastName: req.body.lastName,
-      isSubscribe: req.body.isSubscribe,
-      isPremium: req.body.isPremium,
-      subscribeDate: req.body.subscribeDate,
-			isAdmin: req.body.isAdmin,
-			email: req.body.email,
-			password: hashedPassword,
-		});
-    console.log(user);
-		user.save()
-		.then((data) => {
-			let userToken = jwt.sign({
-				id:data._id
-			}, 'supersecret', { expiresIn: 86400 });
-
-			res.send({
-				token: userToken,
-				auth: true
-			});
-		})
-		.catch((err) => {
-			res.status(500).send({
-				error: 500,
-				message: err.message || "some error occured"
-			})
-		})
-}
-
-exports.login = (req, res) => {
+exports.signin = (req, res) => {
   User.findOne({ email: req.body.email })
     .then((user) => {
       let passwordValid = bcrypt.compareSync(req.body.password, user.password);
       if (!passwordValid) {
         return res.status(401).send({
-          message: "password not valid",
+          message: "Password is not valid !",
           auth: false,
           token: null,
         });
@@ -104,30 +72,52 @@ exports.login = (req, res) => {
     .catch((err) => res.status(404).send(err));
 };
 
+exports.createUser = (req, res) => {
+  let hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  const user = new User({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
+    password: hashedPassword,
+    subscribeDate: req.body.subscribeDate,
+    isStandard: req.body.isStandard,
+    isPremium: req.body.isPremium,
+    isAdmin: req.body.isAdmin,
+  });
+
+  user
+    .save()
+    .then((data) => {
+      let userToken = jwt.sign(
+        {
+          id: data._id,
+        },
+        "supersecret",
+        { expiresIn: 86400 }
+      );
+
+      res.send({
+        token: userToken,
+        auth: true,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        error: 500,
+        message:
+          err.message || "[X] Some error occurred while adding an admin!",
+      });
+    });
+};
+
 exports.getUser = (req, res) => {
   console.log(req.user);
   User.findById(req.user.id)
-      .then((user) => {
-          console.log(user);
+    .then((user) => {
+      console.log(user);
       res.send(user);
     })
     .catch((err) => res.status(404).send(err));
-};
-
-exports.updateUser = (req, res) => {
-  User.findByIdAndUpdate(req.user.id, req.body, {
-    new: true,
-  })
-    .then((data) => {
-      res.send({ user: data });
-    })
-    .catch((err) => res.status(500).json({ err: err }));
-};
-
-exports.verifyToken = (req, res) => {
-    if (req.user) {
-        res.status(200).json({verify:true})
-    }
 };
 
 exports.getUsers = (req, res) => {
@@ -143,7 +133,24 @@ exports.getUsers = (req, res) => {
     .catch((err) => res.send(err));
 };
 
-exports.removeOne = (req, res) => {
+exports.verifyToken = (req, res) => {
+  if (req.user) {
+    res.status(200).json({ verify: true });
+  }
+};
+
+exports.updateUser = (req, res) => {
+  User.findByIdAndUpdate(req.user.id, req.body, {
+    new: true,
+  })
+    .then((data) => {
+      res.send({ user: data });
+    })
+    .catch((err) => res.status(500).json({ err: err }));
+};
+
+
+exports.deleteUser = (req, res) => {
   User.findByIdAndRemove(req.params.id)
     .then((data) => {
       if (!data) {

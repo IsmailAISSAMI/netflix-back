@@ -1,45 +1,43 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require("express");
+const cors = require("cors");
+const { ApolloServer, gql } = require("apollo-server-express");
 const config = require("../configs");
-const cors = require('cors');
+const apiRouter = require("../routes");
+
+// Apollo
+const UserSchema = require("../apollo/schemas/user.schema");
+const CategorySchema = require("../apollo/schemas/category.schema");
+const MovieSchema = require("../apollo/schemas/movie.schema");
+const userResolvers = require("../apollo/resolvers/user.resolver");
+const categoryResolvers = require("../apollo/resolvers/category.resolver");
+const movieResolvers = require("../apollo/resolvers/movie.resolver");
+
+// Setup
 const port = config.server.port;
-const apiRouter = require('../routes');
-const { ApolloServer, gql } = require('apollo-server-express');
-
-const ProductSchema = require('../apollo/schemas/product.schema');
-const UserSchema = require('../apollo/schemas/user.schema');
-const GenreSchema = require('../apollo/schemas/genre.schema');
-
-const productResolvers = require('../apollo/resolvers/product.resolver');
-const userResolvers = require('../apollo/resolvers/user.resolver');
-const genreResolvers = require('../apollo/resolvers/genre.resolver');
-
 const app = express();
-
 const graphQlServer = new ApolloServer({
-  typeDefs: [ProductSchema,UserSchema,GenreSchema],
-  resolvers:[productResolvers,userResolvers, genreResolvers]
+  typeDefs: [UserSchema, CategorySchema, MovieSchema],
+  resolvers: [userResolvers, categoryResolvers, movieResolvers],
 });
 
-graphQlServer.applyMiddleware({ app, path: '/graphql' })
+graphQlServer.applyMiddleware({ app, path: "/graphql" });
 app.use(cors());
-// app.use(bodyParser.json());
-
 app.use(function (req, res, next) {
-  if (req.originalUrl === '/api/v1/webhooks/stripe') {
+  if (req.originalUrl === "/api/v1/webhooks/stripe") {
     next();
   } else {
     express.json()(req, res, next);
   }
 });
-app.use('/api/v1/', apiRouter);
+app.use("/api/v1/", apiRouter);
 
+// Start server
 exports.start = () => {
   app.listen(port, (err) => {
     if (err) {
-      console.log(`Errors: ${err}`);
+      console.log(`[X] Errors: ${err}`);
       process.exit(-1);
     }
-    console.log(`app is runnning on port ${port}`);
+    console.log(`[V] App is running on port ${port}`);
   });
 };
