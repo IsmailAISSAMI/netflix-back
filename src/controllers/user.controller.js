@@ -33,6 +33,7 @@ exports.signup = (req, res) => {
       res.status(200).send({
         auth: true,
         token: userToken,
+        isAdmin: data.isAdmin,
       });
     })
     .catch((err) => {
@@ -67,6 +68,7 @@ exports.signin = (req, res) => {
       res.status(200).send({
         auth: true,
         token: userToken,
+        isAdmin: user.isAdmin,
       });
     })
     .catch((err) => res.status(404).send(err));

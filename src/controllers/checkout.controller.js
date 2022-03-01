@@ -23,7 +23,7 @@ const initiateStripeSession = async (req) => {
       // metadata: { userId: req.user.id, cart: JSON.stringify(req.body.cart) },
     },
     mode: "payment",
-    success_url: `${process.env.NEXT_PUBLIC_API_URL}/browse`,
+    success_url: `${process.env.NEXT_PUBLIC_API_URL}/signin`,
     cancel_url: `${process.env.NEXT_PUBLIC_API_URL}`,
   });
   return session;
